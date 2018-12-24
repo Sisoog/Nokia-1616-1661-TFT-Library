@@ -22,6 +22,7 @@
 
 // definign LCD connection
 #define LCD_PORT		PORTB
+#define LCD_PIN			PINB
 #define LCD_DDR			DDRB
 
 #define LCD_RST			PINB1
@@ -114,6 +115,7 @@ void _nlcdSendCmd(uint8_t data);
 */
 void _nlcdSendData(uint8_t data);
 
+void _nlcdRead(uint8_t Reg,uint8_t *Readbuffer,uint8_t NRead);
 /**
 * inittialize lcd
 */

@@ -43,10 +43,10 @@ LCD_PIN_FUNC(clk, CLK)
 /*----------------------------------------------------------------------------------------------------------------
 * hardware functions
 */
+static uint16_t ShiftBit[] = {0x100,0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
 
 void _nlcdSend(uint16_t data)
 {
-    static uint16_t ShiftBit[] = {0x100,0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
     _cs_clr();
 
         if(data & ShiftBit[0]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
@@ -60,6 +60,71 @@ void _nlcdSend(uint16_t data)
         if(data & ShiftBit[8]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
 
     _cs_set();
+}
+
+uint8_t __nlcdRead(void)
+{
+	uint8_t data = 0;
+	/*Read Bits*/
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
+
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+
+	return data;
+}
+
+void _nlcdRead(uint8_t Reg,uint8_t *Readbuffer,uint8_t NRead)
+{
+	uint16_t data = SPFD54124B_SEND_CMD | Reg;
+	_cs_clr();
+
+	/*Send Command*/
+	if(data & ShiftBit[0]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[1]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[2]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[3]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[4]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[5]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[6]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[7]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+	if(data & ShiftBit[8]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
+
+	/*Now Input Data Line And PullUp It*/
+	LCD_DDR &= ~(1 << LCD_SDA);
+	_sda_set();
+
+	if(NRead==1)
+	{
+		*Readbuffer = __nlcdRead();
+	}
+	else
+	{
+		_clk_set();_clk_clr();	/*send Dummy Clock Cycle*/
+		while(NRead--)
+		{
+			*Readbuffer++ = __nlcdRead();
+		}
+	}
+
+
+	_cs_set();
+
+	/*Make Data Line As Output Again*/
+	LCD_DDR |= (1 << LCD_SDA);
 }
 /*----------------------------------------------------------------------------------------------------------------
 * private functions

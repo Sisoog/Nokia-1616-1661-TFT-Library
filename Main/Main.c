@@ -21,10 +21,13 @@
 #include <util/delay.h>
 #include <nokia1661_lcd_driver.h>
 #include <lcd_font5x7.h>
+#include <stdio.h>
 
 int main(void)
 {
 	nlcdInit();
+
+
 
 	nlcdSetBackgroundColor(LCD_VGA_RED);
 	nlcdClear();
@@ -39,8 +42,22 @@ int main(void)
 	nlcdSetFont(font5x7latcyr);
 	nlcdClear();
 
+	uint8_t ReadID[3] = {0};
+	uint8_t RDDST[4];
+	_nlcdRead(0x04,ReadID,3);	/* Read Display ID */
+	_nlcdRead(0x09,RDDST,4);	/* Read Display Status */
+
+	char temp[20];
+	sprintf(temp,"RDDID:%X %X %X",ReadID[0],ReadID[1],ReadID[2]);
 	nlcdGotoCharXY(1,1);
-	nlcdStringP(LCD_VGA_RED, PSTR("Sisoog.Com"));
+	nlcdString(LCD_VGA_RED,temp);
+
+	sprintf(temp,"RDDST:%X %X %X %X",RDDST[0],RDDST[1],RDDST[2],RDDST[3]);
+	nlcdGotoCharXY(1,2);
+	nlcdString(LCD_VGA_RED,temp);
+
+//	nlcdGotoCharXY(1,1);
+//	nlcdStringP(LCD_VGA_RED, PSTR("Sisoog.Com"));
 	_delay_ms(250);
 
 	nlcdSetOrientation(LCD_ORIENTATION_90);
