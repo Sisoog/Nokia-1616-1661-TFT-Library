@@ -19,23 +19,8 @@
 
 #ifndef _NOKIA1616_H
 #define _NOKIA1616_H
+#include <nokia1661_Hw.h>
 
-// definign LCD connection
-#define LCD_PORT		PORTB
-#define LCD_PIN			PINB
-#define LCD_DDR			DDRB
-
-#define LCD_RST			PINB1
-#define LCD_CS			PINB2
-#define LCD_SDA			PINB3
-#define LCD_CLK			PINB5
-
-
-#if !defined(LCD_PORT) || !defined(LCD_DDR) || !defined(LCD_RST) || !defined(LCD_CS) || !defined(LCD_SDA) || !defined(LCD_CLK)
-#error You need to define ports & pins for LCD usage
-#endif
-
-#include <avr/io.h>
 
 struct font_header
 {

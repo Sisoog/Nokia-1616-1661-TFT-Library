@@ -1,7 +1,7 @@
 #ifndef _LCD_FONT_H
 #define _LCD_FONT_H
+#include "nokia1661_Hw.h"
 
-#include <avr/pgmspace.h>
 
 /*
 	font Latin +  Cyrillic 5x7 dots

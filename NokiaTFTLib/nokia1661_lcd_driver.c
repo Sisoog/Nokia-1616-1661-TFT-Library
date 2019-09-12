@@ -18,27 +18,11 @@
  */
 
 #include "spfd54124b.h"
-#include <util/delay.h>
-#include <avr/pgmspace.h>
 #include "nokia1661_lcd_driver.h"
 
 
 struct N1616Data	_lcd_data;
 
-#define SBI(port,bit) 	asm("sbi %0, %1" : : "I" (_SFR_IO_ADDR(port)), "I" (bit))
-#define CBI(port,bit) 	asm("cbi %0, %1" : : "I" (_SFR_IO_ADDR(port)), "I" (bit))
-
-/*---------------------------------------------------------------------------------------------------------------
-* lcd pin functions
-*/
-#define LCD_PIN_FUNC(a, b) \
-	void _ ## a ## _set() { SBI(LCD_PORT,(LCD_ ## b)); } \
-	void _ ## a ## _clr() { CBI(LCD_PORT,(LCD_ ## b)); }
-
-LCD_PIN_FUNC(rst, RST)
-LCD_PIN_FUNC(cs, CS)
-LCD_PIN_FUNC(sda, SDA)
-LCD_PIN_FUNC(clk, CLK)
 
 /*----------------------------------------------------------------------------------------------------------------
 * hardware functions
@@ -66,23 +50,14 @@ uint8_t __nlcdRead(void)
 {
 	uint8_t data = 0;
 	/*Read Bits*/
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-	_clk_set();	_clk_clr(); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0;
-
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
-//	_clk_clr();_delay_us(100); data<<=1; data|=((LCD_PIN&(1 << LCD_SDA))) ? 1:0; _clk_set();
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
+	_clk_set();	_clk_clr(); data<<=1; data|=(LCD_RSDA()) ? 1:0;
 
 	return data;
 }
@@ -104,7 +79,7 @@ void _nlcdRead(uint8_t Reg,uint8_t *Readbuffer,uint8_t NRead)
 	if(data & ShiftBit[8]) _sda_set(); else _sda_clr();_clk_set();_clk_clr();
 
 	/*Now Input Data Line And PullUp It*/
-	LCD_DDR &= ~(1 << LCD_SDA);
+	_sda_In();
 	_sda_set();
 
 	if(NRead==1)
@@ -124,7 +99,7 @@ void _nlcdRead(uint8_t Reg,uint8_t *Readbuffer,uint8_t NRead)
 	_cs_set();
 
 	/*Make Data Line As Output Again*/
-	LCD_DDR |= (1 << LCD_SDA);
+	_sda_Out();
 }
 /*----------------------------------------------------------------------------------------------------------------
 * private functions
@@ -181,10 +156,15 @@ const uint16_t _lcd_init_list[] =
 
 void nlcdInit()
 {
+	LCD_GPIO_Enable();
+
 	// write 1 to rst and cs
-	LCD_PORT |= (1 << LCD_RST) | (1 << LCD_CS) | (1 << LCD_SDA);
+	_rst_set();
+	_cs_set();
+	_sda_set();
+
 	// init lcd pins
-	LCD_DDR |= (1 << LCD_RST) | (1 << LCD_CS) | (1 << LCD_SDA) | (1 << LCD_CLK);
+	_Init_GPIO();
 
 	_rst_clr();
 	_delay_ms(500);
@@ -232,7 +212,7 @@ void nlcdCharXY(uint8_t x, uint8_t y, rgb_color16bit color, char c)
 
 void nlcdChar(rgb_color16bit color, char c)
 {
-	if(c > nlcdFontLastChar()) return;
+	//if(c > nlcdFontLastChar()) return;
 
 
 	_nlcdSetWindow(_lcd_data.charx, _lcd_data.chary, _lcd_data.charw, _lcd_data.charh);
