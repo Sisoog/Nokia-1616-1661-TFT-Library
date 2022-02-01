@@ -13,6 +13,6 @@ Now support NOKIA_C1_X1_01_101
 
 ![alt text](https://github.com/Behnamzaki/Nokia-1616-1661-TFT-Library/blob/master/lcd_nokia_c1.jpg?raw=true) 
 
-Schametis:
+Schematic:
 
 ![alt text](https://github.com/Behnamzaki/Nokia-1616-1661-TFT-Library/blob/master/sch.png?raw=true) 
