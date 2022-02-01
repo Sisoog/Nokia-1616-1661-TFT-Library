@@ -3,6 +3,9 @@ Nokia 1616 and Nokia 1661 TFT LCD Library For AVR
 
 Add Display image support
 
+https://github.com/Behnamzaki/bmp24_to_rgb565
+
+
 ![alt text](https://github.com/Behnamzaki/Nokia-1616-1661-TFT-Library/blob/master/lcd_img.jpg?raw=true) 
 
 
