@@ -131,6 +131,31 @@ main(int argc, char* argv[])
 
 	for(int i=0;i<32;i++)
 		nlcdPixel(64+31,64+i,LCD_VGA_GREEN);
+	
+	
+	
+	// Display image stored on image.h
+	
+	nlcdSetBackgroundColor(LCD_VGA_WHITE);
+	nlcdClear();
+	
+	nlcdPixel(0,0,LCD_VGA_GREEN); 
+	// there is a bug: in Nokia C1 the nlcdPixel not work in first call! and we call nlcdPixel one time before display image to resolve this bug
+	// note that if dont call nlcdPixel, the first pixel of image not shown!
+	
+	
+	//display image: (give h and w of image manualy from image.h)
+	for(int y=0; y<25; y++){ //h
+		for(int x=0; x<25; x++){ //w
+			nlcdPixel( 10+x,10+y, pgm_read_word(&(image1[y][x])) );		
+		}
+	}
+	
+	
+	
+	
+	
+	
   // Infinite loop
   while (1)
   {

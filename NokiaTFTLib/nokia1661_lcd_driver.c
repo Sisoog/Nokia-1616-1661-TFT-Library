@@ -20,6 +20,15 @@
 #include "spfd54124b.h"
 #include "nokia1661_lcd_driver.h"
 
+//#define NOKIA1661
+#define NOKIA_C1_X1_01_101
+
+#if defined(NOKIA1661) && defined(NOKIA_C1_X1_01_101)
+#error Only Select One LCD Type
+#endif
+#if !defined(NOKIA1661) && !defined(NOKIA_C1_X1_01_101)
+#error You need to define LCD Type
+#endif
 
 struct N1616Data	_lcd_data;
 
@@ -187,8 +196,14 @@ void nlcdClear()
 
 void nlcdPixel(uint8_t x, uint8_t y,rgb_color16bit color)
 {
-	_nlcdCmd1616(SPFD54124B_CMD_CASET, x, x+1);	// column start/end
-	_nlcdCmd1616(SPFD54124B_CMD_RASET, y, y+1);	// page start/end
+	#ifdef NOKIA1661
+		_nlcdCmd1616(SPFD54124B_CMD_CASET, x, x+1);	// column start/end
+		_nlcdCmd1616(SPFD54124B_CMD_RASET, y, y+1);	// page start/end
+	#elif defined(NOKIA_C1_X1_01_101)
+		_nlcdCmd1616(SPFD54124B_CMD_CASET, x, x); // column start/end
+		_nlcdCmd1616(SPFD54124B_CMD_RASET, y, y); // page start/end
+	#endif
+	
 	_nlcdSendCmd(SPFD54124B_CMD_RAMWR);			// RAMWR
 	_nlcdSendData(color >> 8);
 	_nlcdSendData(color & 0xFF);
